@@ -1,0 +1,24 @@
+{
+    "name": "cw1997/think-auth",
+    "description": "Auth Framework",
+    "type": "library",
+    "require": {
+        "topthink/framework": "5.1.*"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "cw1997",
+            "email": "867597730@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "cw1997\\auth\\": "src/"
+        },
+        "files": [
+            "src/helper.php"
+        ]
+    }
+}
