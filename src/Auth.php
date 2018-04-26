@@ -115,8 +115,6 @@ class Auth
         }
     }
 
-
-
     public static function auth(Request $objRequest, $intUserId)
     {
         $strModule = $objRequest->module();
@@ -131,13 +129,16 @@ class Auth
         $strRolePermTableName = $strTablePrefix.config('auth.database.table_name.role_perm');
         $strPermTableName = $strTablePrefix.config('auth.database.table_name.perm');
 
-        $objTemp = Db::table($strUserRoleTableName)->alias('ur')
+        $objSubQuery = Db::table($strUserRoleTableName)->alias('ur')
             ->join("$strRoleTableName r", 'ur.role_id = r.id')
             ->join("$strRolePermTableName rp", 'ur.role_id = rp.role_id')
             ->join("$strPermTableName p", 'rp.perm_id')
-            ->where('ur.user_id', '=', $intUserId);
+            ->where('ur.user_id', '=', $intUserId)
+            ->buildSql();
 
-        $objTemp = $objTemp->where('p.module', '=', $strModule)
+
+        $objTemp = Db::table($objSubQuery.' t')
+            ->where('p.module', '=', $strModule)
             ->whereOr('p.module', '=', '*');
         $intRet = $objTemp->count();
 //        如果用户所属的角色组规则在当前模块有“任意通配符”或者匹配当前模块成功则放行模块访问，否则禁止访问
@@ -145,7 +146,10 @@ class Auth
             return false;
         }
 
-        $objTemp = $objTemp->where('p.controller', '=', $strController)
+        $objTemp = Db::table($objSubQuery.' t')
+            ->where('p.module', '=', $strModule)
+            ->whereOr('p.module', '=', '*')
+            ->where('p.controller', '=', $strController)
             ->whereOr('p.controller', '=', '*');
         $intRet = $objTemp->count();
 //        判断控制器规则，同上
@@ -153,7 +157,12 @@ class Auth
             return false;
         }
 
-        $objTemp = $objTemp->where('p.action', '=', $strAction)
+        $objTemp = Db::table($objSubQuery.' t')
+            ->where('p.module', '=', $strModule)
+            ->whereOr('p.module', '=', '*')
+            ->where('p.controller', '=', $strController)
+            ->whereOr('p.controller', '=', '*')
+            ->where('p.action', '=', $strAction)
             ->whereOr('p.action', '=', '*');
         $intRet = $objTemp->count();
 //        判断操作方法规则，同上
@@ -161,9 +170,11 @@ class Auth
             return false;
         }
 
+
         $objTemp = $objTemp->find();
+        var_dump($objTemp);
         $strFunc = $objTemp->rule_function;
-        if (empty($strFunc)) {
+        if ($strFunc === '*') {
             return true;
         } else {
             return call_user_func($strFunc);
