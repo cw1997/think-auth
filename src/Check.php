@@ -17,11 +17,10 @@ class Check
 {
     public function handle($request, \Closure $next, $name)
     {
-        $strGetUidFuncName = config('auth.func.get_user_id');
+        $strGetUidFuncName = config('auth.get_user_id_func');
         if (!Auth::auth($request, call_user_func($strGetUidFuncName))) {
-            $strAccessDeniedFuncName = config('auth.func.access_denied');
-            exit('access_denied');
-//            return call_user_func($strAccessDeniedFuncName);
+            $strAccessDeniedAction = config('auth.access_denied_action');
+            return redirect($strAccessDeniedAction);
         }
         return $next($request);
     }
