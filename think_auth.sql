@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50553
 File Encoding         : 65001
 
-Date: 2018-04-24 21:47:59
+Date: 2018-04-26 16:34:53
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -27,6 +27,7 @@ CREATE TABLE `think_auth_perm` (
   `controller` varchar(255) NOT NULL COMMENT '控制器',
   `action` varchar(255) NOT NULL COMMENT '操作',
   `parameter` varchar(255) NOT NULL COMMENT '参数',
+  `rule_function` varchar(255) NOT NULL COMMENT '规则函数名',
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
