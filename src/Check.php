@@ -20,7 +20,8 @@ class Check
         $strGetUidFuncName = config('auth.func.get_user_id');
         if (!Auth::auth($request, call_user_func($strGetUidFuncName))) {
             $strAccessDeniedFuncName = config('auth.func.access_denied');
-            return $strAccessDeniedFuncName;
+            exit('access_denied');
+//            return call_user_func($strAccessDeniedFuncName);
         }
         return $next($request);
     }
